@@ -33,9 +33,6 @@
         }
     },
     "lint-staged": {
-        "*.{ts,tsx}": [
-            "tsc --noEmit"
-        ],
         "*.{ts,tsx,js}": [
             "eslint",
             "prettier --write"
