@@ -1,31 +1,25 @@
 import Button from './common/Button';
-import { ethers } from 'ethers';
-import { FunctionComponent, useState } from 'react';
-
-declare let window: any;
+import { FunctionComponent } from 'react';
+import { shortenIfAddress, useEthers } from '@usedapp/core';
+import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 
 export const ConnectWalletButton: FunctionComponent = () => {
-  const [isConnected, setIsConnected] = useState(false);
-  const [userAddress, setUserAddress] = useState('');
+  const { account, activateBrowserWallet, deactivate } = useEthers();
 
-  const connect = async () => {
-    if (typeof window.ethereum !== 'undefined') {
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send('eth_requestAccounts', []);
-        setIsConnected(true);
-        setUserAddress(await provider.getSigner().getAddress());
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      setIsConnected(false);
-    }
-  };
+  if (!account) {
+    return <Button onClick={() => activateBrowserWallet()}>Connect</Button>;
+  }
 
   return (
-    <Button onClick={() => connect()}>
-      {isConnected ? userAddress : 'Connect'}
-    </Button>
+    <Menu>
+      <MenuButton bg="gray.600" px={5} py={2} borderRadius="full">
+        {shortenIfAddress(account)}
+      </MenuButton>
+      <MenuList>
+        <MenuItem>Profile</MenuItem>
+        <MenuItem>Create Event</MenuItem>
+        <MenuItem onClick={deactivate}>Disconnect</MenuItem>
+      </MenuList>
+    </Menu>
   );
 };

@@ -32,6 +32,7 @@ const Event: FunctionComponent<Props> = ({
       px={5}
       py={3}
       position="relative"
+      minW="max-content"
     >
       <Flex mb={1} justifyContent={'space-between'} alignItems="center">
         <Badge py={2} px={3} variant="subtle" colorScheme="green">
@@ -46,7 +47,7 @@ const Event: FunctionComponent<Props> = ({
       </Heading>
       <Text>{description}</Text>
 
-      <Flex mt={3} alignItems="center">
+      <Flex gap={4} mt={3} alignItems="center">
         <Text>{format(mintingDate, 'Qo MMM yyyy')}</Text>
         <Button>Register</Button>
       </Flex>
