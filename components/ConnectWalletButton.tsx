@@ -1,4 +1,4 @@
-import { Button } from '@chakra-ui/react';
+import Button from './common/Button';
 import { ethers } from 'ethers';
 import { FunctionComponent, useState } from 'react';
 
