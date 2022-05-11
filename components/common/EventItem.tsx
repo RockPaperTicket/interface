@@ -1,8 +1,12 @@
 import {
-  Badge,
   Box,
   Flex,
   Heading,
+  Stat,
+  StatHelpText,
+  StatLabel,
+  Tag,
+  TagLabel,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -16,6 +20,7 @@ interface Props {
   numberOfTickets: number;
   mintingDate: Date;
   price: number;
+  registered?: boolean;
 }
 
 const Event: FunctionComponent<Props> = ({
@@ -24,6 +29,7 @@ const Event: FunctionComponent<Props> = ({
   numberOfTickets,
   mintingDate,
   price,
+  registered = false,
 }) => {
   return (
     <Box
@@ -35,21 +41,24 @@ const Event: FunctionComponent<Props> = ({
       minW="max-content"
     >
       <Flex mb={1} justifyContent={'space-between'} alignItems="center">
-        <Badge py={2} px={3} variant="subtle" colorScheme="green">
-          {price} ETH
-        </Badge>
-        <Badge py={2} px={3} variant="outline" colorScheme="gray">
-          {numberOfTickets} tickets
-        </Badge>
+        <Tag variant="subtle" colorScheme="cyan">
+          <TagLabel>{price} ETH</TagLabel>
+        </Tag>
+        <Tag variant="outline" colorScheme="gray">
+          <TagLabel>{numberOfTickets} tickets</TagLabel>
+        </Tag>
       </Flex>
       <Heading as="h3" fontSize={['lg', '2xl']}>
         {name}
       </Heading>
       <Text>{description}</Text>
 
-      <Flex gap={4} mt={3} alignItems="center">
-        <Text>{format(mintingDate, 'Qo MMM yyyy')}</Text>
-        <Button>Register</Button>
+      <Flex gap={4} mt={3} alignItems="center" justifyContent="space-between">
+        <Stat>
+          <StatLabel>Mint date</StatLabel>
+          <StatHelpText>{format(mintingDate, 'Qo MMM yyyy')}</StatHelpText>
+        </Stat>
+        <Button hidden={registered}>Register</Button>
       </Flex>
     </Box>
   );

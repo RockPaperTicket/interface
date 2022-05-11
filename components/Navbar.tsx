@@ -1,4 +1,5 @@
 import { Box, Flex, HStack, useColorModeValue } from '@chakra-ui/react';
+import Link from 'next/link';
 import { FunctionComponent } from 'react';
 import { ConnectWalletButton } from './ConnectWalletButton';
 
@@ -15,10 +16,11 @@ export const Navbar: FunctionComponent = () => {
         borderColor={useColorModeValue('gray.200', 'gray.900')}
         bg={useColorModeValue('gray.200', 'blackAlpha.900')}
         w="full"
+        zIndex={1000}
       >
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <HStack spacing={8} alignItems={'center'}>
-            <Box>Chainlink Hackathon (name TBD)</Box>
+            <Link href="/">Chainlink Hackathon (name TBD)</Link>
           </HStack>
           <Flex alignItems={'center'}>
             <ConnectWalletButton></ConnectWalletButton>

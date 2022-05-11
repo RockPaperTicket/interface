@@ -2,6 +2,7 @@ import Button from './common/Button';
 import { FunctionComponent } from 'react';
 import { shortenIfAddress, useEthers } from '@usedapp/core';
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
+import Link from 'next/link';
 
 export const ConnectWalletButton: FunctionComponent = () => {
   const { account, activateBrowserWallet, deactivate } = useEthers();
@@ -16,7 +17,9 @@ export const ConnectWalletButton: FunctionComponent = () => {
         {shortenIfAddress(account)}
       </MenuButton>
       <MenuList>
-        <MenuItem>Profile</MenuItem>
+        <MenuItem>
+          <Link href="/profile">Profile</Link>
+        </MenuItem>
         <MenuItem>Create Event</MenuItem>
         <MenuItem onClick={deactivate}>Disconnect</MenuItem>
       </MenuList>

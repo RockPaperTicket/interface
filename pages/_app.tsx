@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import { Box, ChakraProvider } from '@chakra-ui/react';
+import { Box, ChakraProvider, Container } from '@chakra-ui/react';
 import '../styles/globals.css';
 import { theme } from '../utils/theme';
 import { Navbar } from '../components/Navbar';
@@ -18,9 +18,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ChakraProvider theme={theme}>
         <Navbar />
         <Box h={20} />
-        <main>
+        <Container as="main" maxW="container.xl">
           <Component {...pageProps} />
-        </main>
+        </Container>
       </ChakraProvider>
     </DAppProvider>
   );

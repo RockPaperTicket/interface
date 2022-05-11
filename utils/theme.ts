@@ -10,7 +10,7 @@ export const theme = extendTheme({
   config,
   fonts: {
     body: 'Graphik',
-    heading: 'Graphik',
+    heading: 'Graphik-Medium',
   },
   styles: {
     global: (props: GlobalStyleProps) => ({
@@ -20,11 +20,11 @@ export const theme = extendTheme({
           props.colorMode === 'light' ? 'gray.100' : 'blackAlpha.800',
         minHeight: '100vh',
       },
-      heading: {
-        lineHeight: '1.1em',
-      },
       '*': {
-        lineHeight: '1.1em',
+        // lineHeight: '1.1em',
+      },
+      a: {
+        width: 'full',
       },
     }),
   },
@@ -40,7 +40,7 @@ export const theme = extendTheme({
       },
     },
     Heading: {
-      baseStyle: { lineHeight: '1em' },
+      baseStyle: { lineHeight: '1em', fontWeight: 'normal' },
     },
     Badge: {
       baseStyle: { borderRadius: 'lg' },
