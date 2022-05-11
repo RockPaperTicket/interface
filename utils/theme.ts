@@ -20,9 +20,6 @@ export const theme = extendTheme({
           props.colorMode === 'light' ? 'gray.100' : 'blackAlpha.800',
         minHeight: '100vh',
       },
-      '*': {
-        // lineHeight: '1.1em',
-      },
       a: {
         width: 'full',
       },
@@ -31,7 +28,6 @@ export const theme = extendTheme({
   components: {
     Button: {
       baseStyle: {
-        fontWeight: 'bold', // Normally, it is "semibold"
         color: 'teal.900',
         _hover: {
           color: 'teal.500',
