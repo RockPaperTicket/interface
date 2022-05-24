@@ -20,7 +20,7 @@ export const Navbar: FunctionComponent = () => {
       >
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <HStack spacing={8} alignItems={'center'}>
-            <Link href="/">Chainlink Hackathon (name TBD)</Link>
+            <Link href="/">RockPaperTicket</Link>
           </HStack>
           <Flex alignItems={'center'}>
             <ConnectWalletButton></ConnectWalletButton>

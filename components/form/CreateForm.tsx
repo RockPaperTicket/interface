@@ -1,6 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { Button } from '@chakra-ui/react';
 import InputField from '../common/form/InputField';
+import { EventFactory__factory } from '../../contracts/types';
+import { ChainId, useEthers } from '@usedapp/core';
+import { useAlertContext } from '../../context/alert';
+import { useActiveChain } from '../../hooks/useActiveChain';
 
 const CreateEventForm = () => {
   const {
@@ -8,9 +12,38 @@ const CreateEventForm = () => {
     register,
     formState: { errors, isSubmitting },
   } = useForm();
+  const { library, switchNetwork } = useEthers();
+  const { isActive, eventFactoryAddress } = useActiveChain();
+  const { openAlert } = useAlertContext();
 
-  const onSubmit = (values: any) => {
-    console.log(values);
+  const onSubmit = async (values: any) => {
+    if (!isActive) return;
+    try {
+      const { name, tickets, price } = values;
+      const signer = library?.getSigner();
+
+      if (!eventFactoryAddress || !signer) return;
+      const eventFactory = EventFactory__factory.connect(
+        eventFactoryAddress,
+        signer
+      );
+
+      const tx = await eventFactory.createEventGame(
+        name,
+        Number(tickets),
+        Number(price)
+      );
+
+      await tx.wait();
+      openAlert('Created a event successfully', 'success');
+    } catch (error: any) {
+      openAlert(
+        error.message.replace(
+          'VM Exception while processing transaction: revert ',
+          ''
+        )
+      );
+    }
   };
 
   return (
@@ -22,15 +55,36 @@ const CreateEventForm = () => {
         register={register}
       />
       <InputField
-        id="description"
-        label="Description"
-        as="textarea"
+        id="tickets"
+        label="Number of tickets"
         errors={errors}
         register={register}
+        type="number"
       />
-      <Button mt={4} colorScheme="teal" isLoading={isSubmitting} type="submit">
-        Submit
-      </Button>
+      <InputField
+        id="price"
+        label="Price"
+        errors={errors}
+        register={register}
+        type="number"
+      />
+      {isActive ? (
+        <Button
+          mt={4}
+          colorScheme="teal"
+          isLoading={isSubmitting}
+          type="submit"
+        >
+          Submit
+        </Button>
+      ) : (
+        <Button
+          colorScheme="yellow"
+          onClick={() => switchNetwork(ChainId.Kovan)}
+        >
+          Switch To Kovan
+        </Button>
+      )}
     </form>
   );
 };
