@@ -14,13 +14,14 @@ const InputField: FunctionComponent<InputFieldProps> = ({
   label,
   id,
   placeholder,
-  minLength = 3,
+  minLength = 1,
   type = 'text',
   as = 'input',
+  min = 1,
 }) => {
   const error = errors?.[id];
   return (
-    <FormControl isInvalid={error}>
+    <FormControl isInvalid={error} mb={4}>
       <FormLabel htmlFor={id}>{label}</FormLabel>
       {as === 'input' ? (
         <Input
@@ -32,6 +33,10 @@ const InputField: FunctionComponent<InputFieldProps> = ({
             minLength: {
               value: minLength,
               message: `The field should contain atleast ${minLength} characters`,
+            },
+            min: {
+              value: min,
+              message: `Value must be greater than ${min}`,
             },
           })}
         />

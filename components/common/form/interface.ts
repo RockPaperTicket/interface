@@ -1,3 +1,4 @@
+import { HTMLInputTypeAttribute } from 'react';
 import { FieldValues, UseFormRegister } from 'react-hook-form';
 
 export interface InputFieldProps {
@@ -9,6 +10,7 @@ export interface InputFieldProps {
   id: string;
   placeholder?: string;
   minLength?: number;
-  type?: string;
+  type?: HTMLInputTypeAttribute;
   as?: 'input' | 'textarea';
+  min?: number;
 }
