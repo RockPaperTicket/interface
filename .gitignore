@@ -6,7 +6,7 @@
 .pnp.js
 
 contracts/codes
-
+.env
 # testing
 /coverage
 
