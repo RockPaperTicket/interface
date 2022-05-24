@@ -15,10 +15,6 @@ declare global {
 
 const config: Config = {
   readOnlyChainId: ChainId.Rinkeby,
-  readOnlyUrls: {
-    [ChainId.Rinkeby]:
-      'https://rinkeby.infura.io/v3/b064d2610dcf4adfab4fa1fc9ee196b2',
-  },
 };
 
 function MyApp({ Component, pageProps }: AppProps) {

@@ -13,7 +13,7 @@ const Home: NextPage = () => {
   const callContract = async () => {
     const provider = new ethers.providers.InfuraProvider(
       'kovan',
-      'b064d2610dcf4adfab4fa1fc9ee196b2'
+      process.env.NEXT_PUBLIC_INFURA_KEY
     );
 
     const contract = EventLog__factory.connect(
