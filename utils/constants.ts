@@ -8,11 +8,11 @@ export const ADDRESSES: {
 } = {
   eventLog: {
     [ChainId.Rinkeby]: '0x60245FcBC8269034C354805b96a2029CcE8F9464',
-    [ChainId.Kovan]: '0x8cd84e12b10770937Cb8C8C3Eb1A45791BF60F56',
+    [ChainId.Kovan]: '0xDD65Cf1280C52A825B4997bC10E3ad688F6Feab3',
   },
   eventFactory: {
     [ChainId.Rinkeby]: '0x165f47c6dB9432A6DbBbee91d679189096173288',
-    [ChainId.Kovan]: '0xE4bE28AD53F21608bE1a9B23C815F902B83324FA',
+    [ChainId.Kovan]: '0x8968d23FB3D852cB110BF6c38cbfCE299BE757FD',
   },
 };
 

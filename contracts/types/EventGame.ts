@@ -48,7 +48,7 @@ export interface EventGameInterface extends utils.Interface {
     's_registeredAddresses(uint256)': FunctionFragment;
     'scoreboard(address)': FunctionFragment;
     'startGame()': FunctionFragment;
-    'test()': FunctionFragment;
+    'status()': FunctionFragment;
     'updateName(string)': FunctionFragment;
     'updatePrice(uint256)': FunctionFragment;
     'updateTickets(uint256)': FunctionFragment;
@@ -63,7 +63,7 @@ export interface EventGameInterface extends utils.Interface {
       | 's_registeredAddresses'
       | 'scoreboard'
       | 'startGame'
-      | 'test'
+      | 'status'
       | 'updateName'
       | 'updatePrice'
       | 'updateTickets'
@@ -85,7 +85,7 @@ export interface EventGameInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: 'scoreboard', values: [string]): string;
   encodeFunctionData(functionFragment: 'startGame', values?: undefined): string;
-  encodeFunctionData(functionFragment: 'test', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'status', values?: undefined): string;
   encodeFunctionData(functionFragment: 'updateName', values: [string]): string;
   encodeFunctionData(
     functionFragment: 'updatePrice',
@@ -115,7 +115,7 @@ export interface EventGameInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: 'scoreboard', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: 'startGame', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'test', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'status', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: 'updateName', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: 'updatePrice',
@@ -204,7 +204,7 @@ export interface EventGame extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    test(overrides?: CallOverrides): Promise<[string]>;
+    status(overrides?: CallOverrides): Promise<[number]>;
 
     updateName(
       _newName: string,
@@ -257,7 +257,7 @@ export interface EventGame extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  test(overrides?: CallOverrides): Promise<string>;
+  status(overrides?: CallOverrides): Promise<number>;
 
   updateName(
     _newName: string,
@@ -306,7 +306,7 @@ export interface EventGame extends BaseContract {
 
     startGame(overrides?: CallOverrides): Promise<void>;
 
-    test(overrides?: CallOverrides): Promise<string>;
+    status(overrides?: CallOverrides): Promise<number>;
 
     updateName(_newName: string, overrides?: CallOverrides): Promise<void>;
 
@@ -358,7 +358,7 @@ export interface EventGame extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    test(overrides?: CallOverrides): Promise<BigNumber>;
+    status(overrides?: CallOverrides): Promise<BigNumber>;
 
     updateName(
       _newName: string,
@@ -407,7 +407,7 @@ export interface EventGame extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    test(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    status(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     updateName(
       _newName: string,

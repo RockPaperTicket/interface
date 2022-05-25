@@ -1,4 +1,5 @@
 import {
+  Box,
   SimpleGrid,
   Tab,
   TabList,
@@ -9,18 +10,20 @@ import {
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import type { NextPage } from 'next';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import Button from '../components/common/Button';
 import Event from '../components/common/EventItem';
-import { EventLog, EventLog__factory } from '../contracts/types';
+import { EventLog__factory } from '../contracts/types';
 import { useActiveChain } from '../hooks/useActiveChain';
+import { useEventLogs } from '../hooks/useEventLogs';
 
 const Profile: NextPage = () => {
-  const [createdEvents, setCreatedEvents] = useState<
-    EventLog.EventStructOutput[]
-  >([]);
-  const [registeredEvents, setRegisteredEvents] = useState<
-    EventLog.EventStructOutput[]
-  >([]);
+  const {
+    registeredEvents,
+    setRegisteredEvents,
+    createdEvents,
+    setCreatedEvents,
+  } = useEventLogs();
   const { eventLogAddress, isActive, account } = useActiveChain();
 
   const callContract = async () => {
@@ -50,7 +53,14 @@ const Profile: NextPage = () => {
             {registeredEvents.length ? (
               <SimpleGrid columns={[1, 2, 3, 4]} gap={6}>
                 {registeredEvents.map((item, index) => (
-                  <Event key={index} registered {...item} />
+                  <Box key={index}>
+                    <Event registered {...item} />
+                    {item.status === 1 && (
+                      <Button w="full" mt={4}>
+                        Play game
+                      </Button>
+                    )}
+                  </Box>
                 ))}
               </SimpleGrid>
             ) : (

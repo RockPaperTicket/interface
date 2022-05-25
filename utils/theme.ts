@@ -34,6 +34,16 @@ export const theme = extendTheme({
           backgroundColor: 'teal.700',
         },
       },
+      variants: {
+        danger: {
+          backgroundColor: 'red.400',
+          color: 'whiteAlpha.900',
+          _hover: {
+            color: 'whiteAlpha.700',
+            backgroundColor: 'red.700',
+          },
+        },
+      },
     },
     Heading: {
       baseStyle: { lineHeight: '1em', fontWeight: 'normal' },
