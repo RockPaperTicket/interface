@@ -24,7 +24,7 @@ const config: Config = {
 };
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const { registeredEvents } = useEventLogs();
+  const { registeredEvents, setRegisteredEvents } = useEventLogs();
   const { setEventNotifications } = useSolidityEvents();
   const { account } = useEthers();
 
@@ -57,6 +57,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       ADDRESSES.eventLog[ChainId.Kovan],
       provider
     );
+    if (!registeredEvents.length && account) {
+      const registeredEvents = await contract.getRegisteredEvents(account);
+      setRegisteredEvents(registeredEvents);
+    }
     contract.on('GameStarted', (gameAddress: any, owner: any) => {
       console.log(gameAddress, owner);
       gameStartedEventFilters(contract);
