@@ -41,7 +41,8 @@ const Notification = () => {
         <PopoverBody>
           {gameStartedEventNotifications.map((notif, index) => (
             <Text key={index}>
-              Game for {notif.eventName} is started by the owner at time
+              Game for {notif.event.eventName} is started by the owner at{' '}
+              {notif.timeStarted}
             </Text>
           ))}
         </PopoverBody>

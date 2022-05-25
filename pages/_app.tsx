@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import { Alert, Box, ChakraProvider, Container } from '@chakra-ui/react';
+import { Box, ChakraProvider, Container } from '@chakra-ui/react';
 import '../styles/globals.css';
 import { theme } from '../utils/theme';
 import { Navbar } from '../components/Navbar';
@@ -11,7 +11,12 @@ import { ADDRESSES } from '../utils/constants';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { useEventLogs } from '../hooks/useEventLogs';
-import { useSolidityEvents } from '../hooks/useSolidityEvents';
+import {
+  NotificationWithTime,
+  useSolidityEvents,
+} from '../hooks/useSolidityEvents';
+import { convertTimestamp } from '../utils/helpers';
+import CustomAlert from '../components/Alert';
 
 declare global {
   interface Window {
@@ -33,15 +38,19 @@ function MyApp({ Component, pageProps }: AppProps) {
     const events = await contract.queryFilter(filter);
     events.reverse();
 
-    const notifications: EventLog.EventStructOutput[] = [];
+    const notifications: NotificationWithTime[] = [];
     events.forEach((event) => {
       const _gameAddress = event.args.gameAddress;
+
       const notification = _.find(
         registeredEvents,
         (u) => u.eventGameAddress === _gameAddress
       );
       if (notification) {
-        notifications.push(notification);
+        notifications.push({
+          event: notification,
+          timeStarted: convertTimestamp(event.args.timeStarted.toString()),
+        });
       }
     });
     setEventNotifications(notifications);
@@ -78,7 +87,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <title>RPT</title>
       </Head>
       <ChakraProvider theme={theme}>
-        <Alert />
+        <CustomAlert />
         <Navbar />
         <Box h={20} />
         <Container as="main" maxW="container.xl">

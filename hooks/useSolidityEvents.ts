@@ -1,12 +1,16 @@
 import create from 'zustand';
 import { EventLog } from '../contracts/types';
 
+export type NotificationWithTime = {
+  event: EventLog.EventStructOutput;
+  timeStarted: string;
+};
 interface State {
-  gameStartedEventNotifications: EventLog.EventStructOutput[];
+  gameStartedEventNotifications: NotificationWithTime[];
 }
 
 interface StateWithMutation extends State {
-  setEventNotifications: (payload: EventLog.EventStructOutput[]) => void;
+  setEventNotifications: (payload: NotificationWithTime[]) => void;
 }
 
 const initialState: State = {

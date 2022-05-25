@@ -61,6 +61,7 @@ export interface EventLogInterface extends utils.Interface {
     '_addCreatedEvent(address,uint256)': FunctionFragment;
     '_addRegisteredEvent(address,uint256)': FunctionFragment;
     '_addWinner(uint256,address)': FunctionFragment;
+    '_gameEnd(uint256)': FunctionFragment;
     '_gameStart(uint256)': FunctionFragment;
     '_getEventName(uint256)': FunctionFragment;
     '_getNumberOfTickets(uint256)': FunctionFragment;
@@ -81,6 +82,7 @@ export interface EventLogInterface extends utils.Interface {
       | '_addCreatedEvent'
       | '_addRegisteredEvent'
       | '_addWinner'
+      | '_gameEnd'
       | '_gameStart'
       | '_getEventName'
       | '_getNumberOfTickets'
@@ -107,6 +109,10 @@ export interface EventLogInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: '_addWinner',
     values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: '_gameEnd',
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: '_gameStart',
@@ -170,6 +176,7 @@ export interface EventLogInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: '_addWinner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: '_gameEnd', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: '_gameStart', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: '_getEventName',
@@ -212,18 +219,33 @@ export interface EventLogInterface extends utils.Interface {
   ): Result;
 
   events: {
-    'GameStarted(address,address)': EventFragment;
+    'GameEnded(address,address,uint256)': EventFragment;
+    'GameStarted(address,address,uint256)': EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: 'GameEnded'): EventFragment;
   getEvent(nameOrSignatureOrTopic: 'GameStarted'): EventFragment;
 }
+
+export interface GameEndedEventObject {
+  gameAddress: string;
+  owner: string;
+  timeStarted: BigNumber;
+}
+export type GameEndedEvent = TypedEvent<
+  [string, string, BigNumber],
+  GameEndedEventObject
+>;
+
+export type GameEndedEventFilter = TypedEventFilter<GameEndedEvent>;
 
 export interface GameStartedEventObject {
   gameAddress: string;
   owner: string;
+  timeStarted: BigNumber;
 }
 export type GameStartedEvent = TypedEvent<
-  [string, string],
+  [string, string, BigNumber],
   GameStartedEventObject
 >;
 
@@ -271,6 +293,11 @@ export interface EventLog extends BaseContract {
     _addWinner(
       _eventId: BigNumberish,
       _winner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    _gameEnd(
+      _eventId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -366,6 +393,11 @@ export interface EventLog extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  _gameEnd(
+    _eventId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   _gameStart(
     _eventId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -458,6 +490,8 @@ export interface EventLog extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    _gameEnd(_eventId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
     _gameStart(
       _eventId: BigNumberish,
       overrides?: CallOverrides
@@ -533,13 +567,26 @@ export interface EventLog extends BaseContract {
   };
 
   filters: {
-    'GameStarted(address,address)'(
+    'GameEnded(address,address,uint256)'(
       gameAddress?: string | null,
-      owner?: string | null
+      owner?: string | null,
+      timeStarted?: null
+    ): GameEndedEventFilter;
+    GameEnded(
+      gameAddress?: string | null,
+      owner?: string | null,
+      timeStarted?: null
+    ): GameEndedEventFilter;
+
+    'GameStarted(address,address,uint256)'(
+      gameAddress?: string | null,
+      owner?: string | null,
+      timeStarted?: null
     ): GameStartedEventFilter;
     GameStarted(
       gameAddress?: string | null,
-      owner?: string | null
+      owner?: string | null,
+      timeStarted?: null
     ): GameStartedEventFilter;
   };
 
@@ -559,6 +606,11 @@ export interface EventLog extends BaseContract {
     _addWinner(
       _eventId: BigNumberish,
       _winner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    _gameEnd(
+      _eventId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -650,6 +702,11 @@ export interface EventLog extends BaseContract {
     _addWinner(
       _eventId: BigNumberish,
       _winner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    _gameEnd(
+      _eventId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
