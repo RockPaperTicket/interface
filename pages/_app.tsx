@@ -6,6 +6,13 @@ import { Navbar } from '../components/Navbar';
 import { ChainId, Config, DAppProvider } from '@usedapp/core';
 import { AlertProvider } from '../context/alert';
 import Head from 'next/head';
+import { useEffect } from 'react';
+import { EventLog, EventLog__factory } from '../contracts/types';
+import { ADDRESSES } from '../utils/constants';
+import { ethers } from 'ethers';
+import _ from 'lodash';
+import { useEventLogs } from '../hooks/useEventLogs';
+import { useSolidityEvents } from '../hooks/useSolidityEvents';
 
 declare global {
   interface Window {
@@ -18,6 +25,49 @@ const config: Config = {
 };
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { registeredEvents } = useEventLogs();
+  const { setEventNotifications } = useSolidityEvents();
+
+  const gameStartedEventFilters = async (contract: EventLog) => {
+    const filter = contract.filters.GameStarted();
+    const events = await contract.queryFilter(filter);
+    events.reverse();
+
+    const notifications: EventLog.EventStructOutput[] = [];
+    events.forEach((event) => {
+      const _gameAddress = event.args.gameAddress;
+      const notification = _.find(
+        registeredEvents,
+        (u) => u.eventGameAddress === _gameAddress
+      );
+      if (notification) {
+        notifications.push(notification);
+      }
+    });
+    setEventNotifications(notifications);
+  };
+
+  const callContract = async () => {
+    const provider = new ethers.providers.InfuraProvider(
+      'kovan',
+      process.env.NEXT_PUBLIC_INFURA_KEY
+    );
+
+    const contract = EventLog__factory.connect(
+      ADDRESSES.eventLog[ChainId.Kovan],
+      provider
+    );
+    contract.on('GameStarted', (gameAddress: any, owner: any) => {
+      console.log(gameAddress, owner);
+      gameStartedEventFilters(contract);
+    });
+    gameStartedEventFilters(contract);
+  };
+
+  useEffect(() => {
+    callContract();
+  }, [registeredEvents]);
+
   return (
     <DAppProvider config={config}>
       <Head>

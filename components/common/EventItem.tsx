@@ -27,14 +27,15 @@ const Event: FunctionComponent<Props> = ({
   numberOfTickets,
   ticketPrice,
   totalUsers,
-  isOpen,
+  status,
   registered = false,
   created = false,
 }) => {
   const { openAlert } = useAlertContext();
   const { isActive } = useActiveChain();
-  const { library } = useEthers();
+  const { library, account } = useEthers();
   const [isLoading, setLoading] = useBoolean();
+  const isEnded = status === 2;
 
   const _contractFunction = async (type: 'register' | 'startGame') => {
     if (!isActive) {
@@ -69,55 +70,74 @@ const Event: FunctionComponent<Props> = ({
   };
 
   return (
-    <Box
-      borderRadius="md"
-      bg={useColorModeValue('whiteAlpha.500', 'gray.900')}
-      px={5}
-      py={3}
-      position="relative"
-      minW="max-content"
-    >
-      <Flex mb={1} justifyContent={'space-between'} alignItems="center">
-        <Tag variant="subtle" colorScheme="cyan">
-          <TagLabel>{ticketPrice.toString()} ETH</TagLabel>
+    <Box position="relative" minW="max-content">
+      {isEnded && (
+        <Tag
+          position="absolute"
+          top="50%"
+          left="50%"
+          style={{
+            transform: 'translate(-50%, -50%) rotate(-45deg)',
+            zIndex: 20,
+          }}
+          fontSize="xl"
+          colorScheme="red"
+        >
+          Expired
         </Tag>
-        <Tag variant="outline" colorScheme="gray">
-          <TagLabel>{numberOfTickets.toString()} tickets</TagLabel>
-        </Tag>
-      </Flex>
-      <Heading as="h3" fontSize={['lg', '2xl']}>
-        {eventName}
-      </Heading>
+      )}
+      <Box
+        borderRadius="md"
+        bg={useColorModeValue('whiteAlpha.500', 'gray.900')}
+        position="relative"
+        zIndex={isEnded ? 'hide' : 'auto'}
+        opacity={isEnded ? 0.5 : 1}
+        px={5}
+        py={3}
+      >
+        <Flex mb={1} justifyContent={'space-between'} alignItems="center">
+          <Tag variant="subtle" colorScheme="cyan">
+            <TagLabel>{ticketPrice.toString()} ETH</TagLabel>
+          </Tag>
+          <Tag variant="outline" colorScheme="gray">
+            <TagLabel>{numberOfTickets.toString()} tickets</TagLabel>
+          </Tag>
+        </Flex>
+        <Heading as="h3" fontSize={['lg', '2xl']}>
+          {eventName}
+        </Heading>
 
-      <Flex gap={4} mt={3} alignItems="center" justifyContent="space-between">
-        {totalUsers.toNumber() > 0 ? (
-          <Stat>
-            <StatLabel>{totalUsers.toString()} Users</StatLabel>
-          </Stat>
-        ) : (
-          <div></div>
-        )}
-
-        {isActive &&
-          (created ? (
-            <Button
-              isLoading={isLoading}
-              onClick={() => _contractFunction('startGame')}
-            >
-              Start
-            </Button>
+        <Flex gap={4} mt={3} alignItems="center" justifyContent="space-between">
+          {totalUsers.toNumber() > 0 ? (
+            <Stat>
+              <StatLabel>{totalUsers.toString()} Users</StatLabel>
+            </Stat>
           ) : (
-            !registered &&
-            isOpen && (
+            <div></div>
+          )}
+
+          {account &&
+            isActive &&
+            (created ? (
               <Button
                 isLoading={isLoading}
-                onClick={() => _contractFunction('register')}
+                onClick={() => _contractFunction('startGame')}
               >
-                Register
+                Start
               </Button>
-            )
-          ))}
-      </Flex>
+            ) : (
+              !registered &&
+              status === 0 && (
+                <Button
+                  isLoading={isLoading}
+                  onClick={() => _contractFunction('register')}
+                >
+                  Register
+                </Button>
+              )
+            ))}
+        </Flex>
+      </Box>
     </Box>
   );
 };
