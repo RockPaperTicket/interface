@@ -3,8 +3,8 @@ import { Button } from '@chakra-ui/react';
 import InputField from '../common/form/InputField';
 import { EventFactory__factory } from '../../contracts/types';
 import { ChainId, useEthers } from '@usedapp/core';
-import { useAlertContext } from '../../context/alert';
 import { useActiveChain } from '../../hooks/useActiveChain';
+import { useAlert } from '../../hooks/useAlert';
 
 const CreateEventForm = () => {
   const {
@@ -14,7 +14,7 @@ const CreateEventForm = () => {
   } = useForm();
   const { library, switchNetwork } = useEthers();
   const { isActive, eventFactoryAddress } = useActiveChain();
-  const { openAlert } = useAlertContext();
+  const { openAlert } = useAlert();
 
   const onSubmit = async (values: any) => {
     if (!isActive) return;

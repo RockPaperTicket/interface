@@ -12,9 +12,9 @@ import {
 import { FunctionComponent } from 'react';
 import Button from './Button';
 import { EventGame__factory, EventLog } from '../../contracts/types';
-import { useAlertContext } from '../../context/alert';
 import { useActiveChain } from '../../hooks/useActiveChain';
 import { useEthers } from '@usedapp/core';
+import { useAlert } from '../../hooks/useAlert';
 
 interface Props extends EventLog.EventStructOutput {
   registered?: boolean;
@@ -31,7 +31,7 @@ const Event: FunctionComponent<Props> = ({
   registered = false,
   created = false,
 }) => {
-  const { openAlert } = useAlertContext();
+  const { openAlert } = useAlert();
   const { isActive } = useActiveChain();
   const { library, account } = useEthers();
   const [isLoading, setLoading] = useBoolean();

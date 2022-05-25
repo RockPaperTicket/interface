@@ -1,10 +1,9 @@
 import type { AppProps } from 'next/app';
-import { Box, ChakraProvider, Container } from '@chakra-ui/react';
+import { Alert, Box, ChakraProvider, Container } from '@chakra-ui/react';
 import '../styles/globals.css';
 import { theme } from '../utils/theme';
 import { Navbar } from '../components/Navbar';
 import { ChainId, Config, DAppProvider, useEthers } from '@usedapp/core';
-import { AlertProvider } from '../context/alert';
 import Head from 'next/head';
 import { useEffect } from 'react';
 import { EventLog, EventLog__factory } from '../contracts/types';
@@ -75,13 +74,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         <title>RPT</title>
       </Head>
       <ChakraProvider theme={theme}>
-        <AlertProvider>
-          <Navbar />
-          <Box h={20} />
-          <Container as="main" maxW="container.xl">
-            <Component {...pageProps} />
-          </Container>
-        </AlertProvider>
+        <Alert />
+        <Navbar />
+        <Box h={20} />
+        <Container as="main" maxW="container.xl">
+          <Component {...pageProps} />
+        </Container>
       </ChakraProvider>
     </DAppProvider>
   );
