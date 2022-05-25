@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import type { NextPage } from 'next';
+import Link from 'next/link';
 import { useEffect } from 'react';
 import Button from '../components/common/Button';
 import Event from '../components/common/EventItem';
@@ -57,7 +58,9 @@ const Profile: NextPage = () => {
                     <Event registered {...item} />
                     {item.status === 1 && (
                       <Button w="full" mt={4}>
-                        Play game
+                        <Link href={`/${item.eventGameAddress}`}>
+                          Play game
+                        </Link>
                       </Button>
                     )}
                   </Box>
