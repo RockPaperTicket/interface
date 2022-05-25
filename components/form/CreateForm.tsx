@@ -12,8 +12,8 @@ const CreateEventForm = () => {
     register,
     formState: { errors, isSubmitting },
   } = useForm();
-  const { library, switchNetwork } = useEthers();
-  const { isActive, eventFactoryAddress } = useActiveChain();
+  const { library, switchNetwork, activateBrowserWallet } = useEthers();
+  const { isActive, eventFactoryAddress, account } = useActiveChain();
   const { openAlert } = useAlert();
 
   const onSubmit = async (values: any) => {
@@ -68,7 +68,9 @@ const CreateEventForm = () => {
         register={register}
         type="number"
       />
-      {isActive ? (
+      {!account ? (
+        <Button onClick={activateBrowserWallet}>Connect</Button>
+      ) : isActive ? (
         <Button
           mt={4}
           colorScheme="teal"

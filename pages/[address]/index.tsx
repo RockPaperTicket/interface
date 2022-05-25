@@ -1,5 +1,6 @@
 import {
   Box,
+  Center,
   Container,
   Flex,
   Grid,
@@ -17,6 +18,7 @@ import {
   Thead,
   Tr,
   useBoolean,
+  useInterval,
 } from '@chakra-ui/react';
 import { shortenIfAddress, useEthers } from '@usedapp/core';
 import { ethers } from 'ethers';
@@ -47,6 +49,7 @@ export default function Game() {
   const [isRegistered, setIsRegistered] = useState<boolean>(true);
   const [history, setHistory] = useState<string[]>([]);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
+  const [status, setStatus] = useState(0);
 
   const router = useRouter();
   const { isActive, account } = useActiveChain();
@@ -113,7 +116,10 @@ export default function Game() {
   };
 
   const calculateLeaderboard = async (_contract?: EventGame) => {
+    if (!isActive) return;
     const contract = _contract ?? gameContract;
+    const status = await contract?.status();
+    setStatus(status ?? 0);
     const leaderboard: Leaderboard[] = [];
     for (let i = 0; i < 1000; i++) {
       try {
@@ -138,6 +144,8 @@ export default function Game() {
   useEffect(() => {
     callContract();
   }, [isActive, account]);
+
+  useInterval(calculateLeaderboard, 10000);
 
   const _onPlay = async () => {
     if (!isActive) {
@@ -167,8 +175,51 @@ export default function Game() {
     setLoading.off();
   };
 
+  const _registerToGame = async () => {
+    if (!isActive) {
+      openAlert('Please switch to kovan network');
+      return;
+    }
+    setLoading.on();
+    try {
+      const signer = library?.getSigner();
+
+      if (!gameAddress || !signer) return;
+      const eventFactory = EventGame__factory.connect(gameAddress, signer);
+      const tx = await eventFactory.register();
+      await tx.wait();
+      openAlert('You registered successfully', 'success');
+    } catch (error: any) {
+      openAlert(
+        error.message.replace(
+          'VM Exception while processing transaction: revert ',
+          ''
+        )
+      );
+    }
+    setLoading.off();
+  };
+
   if (!isRegistered)
-    return <Container>You need to be registered in the game</Container>;
+    return (
+      <Center minH="100vh">
+        <Text fontSize={'2xl'}>
+          You need to be registered in order to be able to play the game
+        </Text>
+        {status === 0 && (
+          <Button onClick={_registerToGame} isLoading={isLoading}>
+            Register
+          </Button>
+        )}
+      </Center>
+    );
+
+  if (status === 2)
+    return (
+      <Center minH="100vh" minW="100vw">
+        <Text fontSize={'2xl'}>The game has come to an end</Text>
+      </Center>
+    );
 
   const LeaderboardComponent = () => (
     <TableContainer maxH={'80vh'} overflowY="auto">
@@ -254,9 +305,11 @@ export default function Game() {
             ))}
           </Flex>
 
-          <Button isLoading={isLoading} onClick={_onPlay}>
-            Play
-          </Button>
+          {account && (
+            <Button isLoading={isLoading} onClick={_onPlay}>
+              Play
+            </Button>
+          )}
         </Flex>
       )}
     </Container>
