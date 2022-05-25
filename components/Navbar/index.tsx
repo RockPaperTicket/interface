@@ -51,7 +51,7 @@ export const Navbar: FunctionComponent = () => {
             </Flex>
           )}
           <Flex gap={4} alignItems={'center'}>
-            <Notification />
+            {account && <Notification />}
             <ConnectWalletButton />
           </Flex>
         </Flex>

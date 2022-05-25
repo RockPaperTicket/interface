@@ -3,7 +3,7 @@ import { Box, ChakraProvider, Container } from '@chakra-ui/react';
 import '../styles/globals.css';
 import { theme } from '../utils/theme';
 import { Navbar } from '../components/Navbar';
-import { ChainId, Config, DAppProvider } from '@usedapp/core';
+import { ChainId, Config, DAppProvider, useEthers } from '@usedapp/core';
 import { AlertProvider } from '../context/alert';
 import Head from 'next/head';
 import { useEffect } from 'react';
@@ -27,6 +27,7 @@ const config: Config = {
 function MyApp({ Component, pageProps }: AppProps) {
   const { registeredEvents } = useEventLogs();
   const { setEventNotifications } = useSolidityEvents();
+  const { account } = useEthers();
 
   const gameStartedEventFilters = async (contract: EventLog) => {
     const filter = contract.filters.GameStarted();
@@ -66,7 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     callContract();
-  }, [registeredEvents]);
+  }, [registeredEvents, account]);
 
   return (
     <DAppProvider config={config}>
