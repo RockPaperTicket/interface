@@ -3,26 +3,26 @@ import type { NextPage } from 'next';
 import { useEffect } from 'react';
 import Event from '../components/common/EventItem';
 import { EventLog__factory } from '../contracts/types';
-import { ADDRESSES } from '../utils/constants';
-import { ChainId } from '@usedapp/core';
-import { ethers } from 'ethers';
+import { ConnectedEventLogAddress } from '../utils/constants';
 import { useEventLogs } from '../hooks/useEventLogs';
+import { getAlchemyProvider } from '../utils/contract/connectors';
 
 const Home: NextPage = () => {
   const { openEvents, setOpenEvents } = useEventLogs();
 
   const callContract = async () => {
-    const provider = new ethers.providers.InfuraProvider(
-      'kovan',
-      process.env.NEXT_PUBLIC_INFURA_KEY
-    );
+    const provider = getAlchemyProvider();
 
-    const contract = EventLog__factory.connect(
-      ADDRESSES.eventLog[ChainId.Kovan],
-      provider
-    );
-    const events = await contract.getOpenEvents();
-    setOpenEvents(events);
+    try {
+      const contract = EventLog__factory.connect(
+        ConnectedEventLogAddress,
+        provider
+      );
+      const events = await contract.getOpenEvents();
+      setOpenEvents(events);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

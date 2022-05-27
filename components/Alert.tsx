@@ -14,6 +14,7 @@ const CustomAlert = () => {
           transform: 'translateX(-50%)',
           zIndex: 1000,
         }}
+        maxW="container.md"
       >
         <Alert status={status}>
           <AlertIcon />

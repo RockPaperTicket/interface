@@ -11,10 +11,20 @@ import {
 } from '@chakra-ui/react';
 import { FunctionComponent } from 'react';
 import Button from './Button';
-import { EventGame__factory, EventLog } from '../../contracts/types';
+import {
+  EventGame__factory,
+  EventLog,
+  EventLog__factory,
+} from '../../contracts/types';
 import { useActiveChain } from '../../hooks/useActiveChain';
 import { useEthers } from '@usedapp/core';
 import { useAlert } from '../../hooks/useAlert';
+import {
+  ConnectedEventLogAddress,
+  ConnectToNetwork,
+} from '../../utils/constants';
+import { getAlchemyProvider } from '../../utils/contract/connectors';
+import { useEventLogs } from '../../hooks/useEventLogs';
 
 interface Props extends EventLog.EventStructOutput {
   registered?: boolean;
@@ -32,14 +42,29 @@ const Event: FunctionComponent<Props> = ({
   created = false,
 }) => {
   const { openAlert } = useAlert();
+  const { setCreatedEvents, setRegisteredEvents } = useEventLogs();
   const { isActive } = useActiveChain();
   const { library, account } = useEthers();
   const [isLoading, setLoading] = useBoolean();
   const isEnded = status === 2;
 
-  const _contractFunction = async (type: 'register' | 'startGame') => {
+  const _setEvents = async () => {
+    const provider = getAlchemyProvider();
+    const contract = EventLog__factory.connect(
+      ConnectedEventLogAddress,
+      provider
+    );
+    const createdEvents = await contract.getCreatedEvents(account!);
+    setCreatedEvents(createdEvents);
+    const registeredEvents = await contract.getRegisteredEvents(account!);
+    setRegisteredEvents(registeredEvents);
+  };
+
+  const _contractFunction = async (
+    type: 'register' | 'startGame' | 'endGame'
+  ) => {
     if (!isActive) {
-      openAlert('Please switch to kovan network');
+      openAlert(`Please switch to ${ConnectToNetwork} network`);
       return;
     }
     setLoading.on();
@@ -52,10 +77,21 @@ const Event: FunctionComponent<Props> = ({
         const tx = await eventFactory.register();
         await tx.wait();
         openAlert('You registered successfully', 'success');
-      } else {
-        const tx = await eventFactory.startGame();
+      } else if (type === 'startGame') {
+        const tx = await eventFactory.startGame({
+          gasLimit: 8000000,
+        });
+
         await tx.wait();
+        _setEvents();
         openAlert('Game is started', 'success');
+      } else {
+        const tx = await eventFactory.endGame({
+          gasLimit: 8000000,
+        });
+        await tx.wait();
+        _setEvents();
+        openAlert('Game is ended', 'success');
       }
     } catch (error: any) {
       console.log(error);
@@ -68,6 +104,23 @@ const Event: FunctionComponent<Props> = ({
     }
     setLoading.off();
   };
+
+  const GameButton = () =>
+    status === 0 ? (
+      <Button
+        isLoading={isLoading}
+        onClick={() => _contractFunction('startGame')}
+      >
+        Start Game
+      </Button>
+    ) : (
+      <Button
+        isLoading={isLoading}
+        onClick={() => _contractFunction('endGame')}
+      >
+        End Game
+      </Button>
+    );
 
   return (
     <Box position="relative" minW="max-content">
@@ -119,12 +172,7 @@ const Event: FunctionComponent<Props> = ({
           {account &&
             isActive &&
             (created ? (
-              <Button
-                isLoading={isLoading}
-                onClick={() => _contractFunction('startGame')}
-              >
-                Start
-              </Button>
+              <GameButton />
             ) : (
               !registered &&
               status === 0 && (

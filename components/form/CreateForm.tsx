@@ -2,9 +2,10 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@chakra-ui/react';
 import InputField from '../common/form/InputField';
 import { EventFactory__factory } from '../../contracts/types';
-import { ChainId, useEthers } from '@usedapp/core';
+import { useEthers } from '@usedapp/core';
 import { useActiveChain } from '../../hooks/useActiveChain';
 import { useAlert } from '../../hooks/useAlert';
+import { AvailableChains, ConnectToNetwork } from '../../utils/constants';
 
 const CreateEventForm = () => {
   const {
@@ -82,9 +83,10 @@ const CreateEventForm = () => {
       ) : (
         <Button
           colorScheme="yellow"
-          onClick={() => switchNetwork(ChainId.Kovan)}
+          textTransform="capitalize"
+          onClick={() => switchNetwork(AvailableChains[0])}
         >
-          Switch To Kovan
+          Switch To {ConnectToNetwork}
         </Button>
       )}
     </form>

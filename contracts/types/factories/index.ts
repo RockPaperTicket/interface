@@ -4,3 +4,4 @@
 export { EventFactory__factory } from './EventFactory__factory';
 export { EventGame__factory } from './EventGame__factory';
 export { EventLog__factory } from './EventLog__factory';
+export { MintTicket__factory } from './MintTicket__factory';
