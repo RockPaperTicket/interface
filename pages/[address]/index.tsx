@@ -20,7 +20,7 @@ import {
   useBoolean,
   useInterval,
 } from '@chakra-ui/react';
-import { shortenIfAddress, useEthers } from '@usedapp/core';
+import { ChainId, shortenIfAddress, useEthers } from '@usedapp/core';
 import { ethers } from 'ethers';
 import { motion } from 'framer-motion';
 import _ from 'lodash';
@@ -28,9 +28,15 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Button from '../../components/common/Button';
-import { EventGame, EventGame__factory } from '../../contracts/types';
+import {
+  EventGame,
+  EventGame__factory,
+  MintTicket__factory,
+} from '../../contracts/types';
 import { useActiveChain } from '../../hooks/useActiveChain';
 import { useAlert } from '../../hooks/useAlert';
+import { ADDRESSES, ConnectToNetwork } from '../../utils/constants';
+import { getAlchemyProvider } from '../../utils/contract/connectors';
 
 interface Leaderboard {
   address: string;
@@ -46,10 +52,12 @@ export default function Game() {
   const [scoreboard, setScoreboard] =
     useState<EventGame.UserScoreStructOutput>();
   const [selectedSign, setSelectedSign] = useState<number>();
-  const [isRegistered, setIsRegistered] = useState<boolean>(true);
+  const [isRegistered, setIsRegistered] = useState(true);
+  const [isWinner, setIsWinner] = useState(true);
   const [history, setHistory] = useState<string[]>([]);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [status, setStatus] = useState(0);
+  const [showResult, setShowResult] = useState(false);
 
   const router = useRouter();
   const { isActive, account } = useActiveChain();
@@ -61,21 +69,20 @@ export default function Game() {
 
   const callContract = async () => {
     if (!gameAddress || !account) return;
-    const provider = new ethers.providers.InfuraProvider(
-      'kovan',
-      process.env.NEXT_PUBLIC_INFURA_KEY
-    );
+    const provider = getAlchemyProvider();
 
     const contract = EventGame__factory.connect(gameAddress, provider);
     getRegistered(contract);
     getScore(contract);
     getResultEvent(contract);
     calculateLeaderboard(contract);
+    getIsWinner(contract);
     setGameContract(contract);
 
     const filters = contract.filters.result(gameAddress, account);
     contract.removeAllListeners('result');
     contract.on(filters, (_gameAddress, _player, result) => {
+      console.log('result ', gameAddress, showResult);
       if (_gameAddress === gameAddress && _player === account) {
         if (result === 'win') {
           openAlert('You won', 'success');
@@ -84,6 +91,8 @@ export default function Game() {
         }
       }
     });
+
+    setShowResult(true);
   };
 
   const getRegistered = async (_contract?: EventGame) => {
@@ -106,7 +115,6 @@ export default function Game() {
 
     const filters = contract?.filters.result(gameAddress, account);
     const events = await contract?.queryFilter(filters!);
-    events?.reverse();
 
     const history: string[] = [];
     events?.forEach((event) => {
@@ -116,10 +124,10 @@ export default function Game() {
   };
 
   const calculateLeaderboard = async (_contract?: EventGame) => {
-    if (!isActive) return;
+    if (!isActive || status === 2) return;
     const contract = _contract ?? gameContract;
-    const status = await contract?.status();
-    setStatus(status ?? 0);
+    const getStatus = await contract?.status();
+    setStatus(getStatus ?? 0);
     const leaderboard: Leaderboard[] = [];
     for (let i = 0; i < 1000; i++) {
       try {
@@ -141,28 +149,45 @@ export default function Game() {
     setLeaderboard(_.orderBy(leaderboard, ['points'], ['asc']));
   };
 
+  const getIsWinner = async (_contract?: EventGame) => {
+    if (!account) return;
+    const contract = _contract ?? gameContract;
+    const isWinner = await contract?.isWinner(account);
+    console.log('winnd', isWinner);
+    setIsWinner(isWinner ?? false);
+  };
+
   useEffect(() => {
     callContract();
   }, [isActive, account]);
 
+  useEffect(() => {
+    if (status === 2) {
+      getIsWinner();
+    }
+  }, [status, account]);
+
   useInterval(calculateLeaderboard, 10000);
 
   const _onPlay = async () => {
+    if (selectedSign === undefined) return;
     if (!isActive) {
-      openAlert('Please switch to kovan network');
+      openAlert(`Please switch to ${ConnectToNetwork} network`);
       return;
     }
     setLoading.on();
     try {
       const signer = library?.getSigner();
+      console.log(signer);
 
-      if (!gameAddress || !signer || !selectedSign) return;
+      if (!gameAddress || !signer) return;
       const eventFactory = EventGame__factory.connect(gameAddress, signer);
 
       const tx = await eventFactory.userPlay(selectedSign);
       await tx.wait();
       getResultEvent();
       getScore();
+      setSelectedSign(undefined);
     } catch (error: any) {
       console.log(error);
       openAlert(
@@ -177,7 +202,7 @@ export default function Game() {
 
   const _registerToGame = async () => {
     if (!isActive) {
-      openAlert('Please switch to kovan network');
+      openAlert(`Please switch to ${ConnectToNetwork} network`);
       return;
     }
     setLoading.on();
@@ -200,9 +225,57 @@ export default function Game() {
     setLoading.off();
   };
 
+  const _mintTicket = async () => {
+    setLoading.on();
+    try {
+      const signer = library?.getSigner();
+
+      if (!gameAddress || !signer) return;
+      const contract = MintTicket__factory.connect(
+        ADDRESSES.mintTicket[ChainId.Rinkeby],
+        signer
+      );
+      const tx = await contract.mintTicket(gameAddress);
+      await tx.wait();
+      openAlert("You've minted your ticket", 'success');
+    } catch (error: any) {
+      openAlert(
+        error.message.replace(
+          'VM Exception while processing transaction: revert ',
+          ''
+        )
+      );
+    }
+    setLoading.off();
+  };
+
+  if (status === 0)
+    return (
+      <Center flexDirection="column" gap={3} minH="80vh">
+        <Text fontSize={'2xl'}>The game is not started yet</Text>
+      </Center>
+    );
+
+  if (status === 2)
+    return (
+      <Center flexDirection="column" gap={3} minH="80vh">
+        <Text fontSize={'2xl'}>The game has come to an end</Text>
+        {isWinner && (
+          <>
+            <Text>
+              Congratulations, You&apos;re able to mint your ticket here
+            </Text>
+            <Button onClick={_mintTicket} isLoading={isLoading}>
+              Mint Ticket
+            </Button>
+          </>
+        )}
+      </Center>
+    );
+
   if (!isRegistered)
     return (
-      <Center minH="100vh">
+      <Center flexDirection="column" gap={3} minH="80vh">
         <Text fontSize={'2xl'}>
           You need to be registered in order to be able to play the game
         </Text>
@@ -211,13 +284,6 @@ export default function Game() {
             Register
           </Button>
         )}
-      </Center>
-    );
-
-  if (status === 2)
-    return (
-      <Center minH="100vh" minW="100vw">
-        <Text fontSize={'2xl'}>The game has come to an end</Text>
       </Center>
     );
 
@@ -264,11 +330,18 @@ export default function Game() {
       {history.length > 0 && (
         <Box mb={4}>
           <Text>History: </Text>
-          {history.map((val, i) => (
-            <Tag colorScheme={val === 'win' ? 'green' : 'red'} key={i}>
-              {val}
-            </Tag>
-          ))}
+          <Flex gap={2}>
+            {history.map((val, i) => (
+              <Tag
+                colorScheme={
+                  val === 'win' ? 'green' : val === 'loss' ? 'red' : 'cyan'
+                }
+                key={i}
+              >
+                {val}
+              </Tag>
+            ))}
+          </Flex>
         </Box>
       )}
 

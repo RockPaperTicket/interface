@@ -63,8 +63,6 @@ export interface EventLogInterface extends utils.Interface {
     '_addWinner(uint256,address)': FunctionFragment;
     '_gameEnd(uint256)': FunctionFragment;
     '_gameStart(uint256)': FunctionFragment;
-    '_getEventName(uint256)': FunctionFragment;
-    '_getNumberOfTickets(uint256)': FunctionFragment;
     '_isWinner(uint256,address)': FunctionFragment;
     '_logEvent(uint256,address,address,string,uint256,uint256)': FunctionFragment;
     '_updateName(uint256,string)': FunctionFragment;
@@ -73,6 +71,8 @@ export interface EventLogInterface extends utils.Interface {
     'getCreatedEvents(address)': FunctionFragment;
     'getEvent(uint256)': FunctionFragment;
     'getEventAddress(uint256)': FunctionFragment;
+    'getEventName(uint256)': FunctionFragment;
+    'getNumberOfTickets(uint256)': FunctionFragment;
     'getOpenEvents()': FunctionFragment;
     'getRegisteredEvents(address)': FunctionFragment;
   };
@@ -84,8 +84,6 @@ export interface EventLogInterface extends utils.Interface {
       | '_addWinner'
       | '_gameEnd'
       | '_gameStart'
-      | '_getEventName'
-      | '_getNumberOfTickets'
       | '_isWinner'
       | '_logEvent'
       | '_updateName'
@@ -94,6 +92,8 @@ export interface EventLogInterface extends utils.Interface {
       | 'getCreatedEvents'
       | 'getEvent'
       | 'getEventAddress'
+      | 'getEventName'
+      | 'getNumberOfTickets'
       | 'getOpenEvents'
       | 'getRegisteredEvents'
   ): FunctionFragment;
@@ -116,14 +116,6 @@ export interface EventLogInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: '_gameStart',
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: '_getEventName',
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: '_getNumberOfTickets',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -159,6 +151,14 @@ export interface EventLogInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: 'getEventName',
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'getNumberOfTickets',
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: 'getOpenEvents',
     values?: undefined
   ): string;
@@ -178,14 +178,6 @@ export interface EventLogInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: '_addWinner', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: '_gameEnd', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: '_gameStart', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: '_getEventName',
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: '_getNumberOfTickets',
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: '_isWinner', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: '_logEvent', data: BytesLike): Result;
   decodeFunctionResult(
@@ -207,6 +199,14 @@ export interface EventLogInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: 'getEvent', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: 'getEventAddress',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'getEventName',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'getNumberOfTickets',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -306,16 +306,6 @@ export interface EventLog extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    _getEventName(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    _getNumberOfTickets(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     _isWinner(
       _eventId: BigNumberish,
       _userAddress: string,
@@ -365,6 +355,16 @@ export interface EventLog extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getEventName(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getNumberOfTickets(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     getOpenEvents(
       overrides?: CallOverrides
     ): Promise<[EventLog.EventStructOutput[]]>;
@@ -402,16 +402,6 @@ export interface EventLog extends BaseContract {
     _eventId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  _getEventName(
-    _eventId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  _getNumberOfTickets(
-    _eventId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   _isWinner(
     _eventId: BigNumberish,
@@ -462,6 +452,16 @@ export interface EventLog extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getEventName(
+    _eventId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getNumberOfTickets(
+    _eventId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   getOpenEvents(
     overrides?: CallOverrides
   ): Promise<EventLog.EventStructOutput[]>;
@@ -496,16 +496,6 @@ export interface EventLog extends BaseContract {
       _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    _getEventName(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    _getNumberOfTickets(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     _isWinner(
       _eventId: BigNumberish,
@@ -555,6 +545,16 @@ export interface EventLog extends BaseContract {
       _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getEventName(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getNumberOfTickets(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getOpenEvents(
       overrides?: CallOverrides
@@ -619,16 +619,6 @@ export interface EventLog extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    _getEventName(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    _getNumberOfTickets(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     _isWinner(
       _eventId: BigNumberish,
       _userAddress: string,
@@ -674,6 +664,16 @@ export interface EventLog extends BaseContract {
     ): Promise<BigNumber>;
 
     getEventAddress(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getEventName(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getNumberOfTickets(
       _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -715,16 +715,6 @@ export interface EventLog extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    _getEventName(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    _getNumberOfTickets(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     _isWinner(
       _eventId: BigNumberish,
       _userAddress: string,
@@ -770,6 +760,16 @@ export interface EventLog extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getEventAddress(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getEventName(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNumberOfTickets(
       _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

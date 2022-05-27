@@ -28,6 +28,6 @@ export const useAlert = create<StateWithMutation>((set) => ({
     clearTimeout(debouncedCallback);
     debouncedCallback = setTimeout(() => {
       set((state) => ({ ...state, isOpen: false }));
-    }, 1000);
+    }, 2500);
   },
 }));

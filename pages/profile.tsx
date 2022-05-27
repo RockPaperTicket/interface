@@ -42,6 +42,17 @@ const Profile: NextPage = () => {
     callContract();
   }, [isActive, account]);
 
+  const _buttonText = (status: number) => {
+    switch (status) {
+      case 0:
+        return 'Enter playground';
+      case 1:
+        return 'Play game';
+      default:
+        return 'Check Eligibility';
+    }
+  };
+
   return (
     <>
       <Tabs variant="enclosed">
@@ -56,13 +67,11 @@ const Profile: NextPage = () => {
                 {registeredEvents.map((item, index) => (
                   <Box key={index}>
                     <Event registered {...item} />
-                    {item.status === 1 && (
-                      <Button w="full" mt={4}>
-                        <Link href={`/${item.eventGameAddress}`}>
-                          Play game
-                        </Link>
-                      </Button>
-                    )}
+                    <Button w="full" mt={4}>
+                      <Link href={`/${item.eventGameAddress}`}>
+                        {_buttonText(item.status)}
+                      </Link>
+                    </Button>
                   </Box>
                 ))}
               </SimpleGrid>

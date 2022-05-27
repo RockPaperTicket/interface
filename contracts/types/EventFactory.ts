@@ -90,7 +90,7 @@ export interface EventFactory extends BaseContract {
       _numberOfTickets: BigNumberish,
       _ticketPrice: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
   };
 
   filters: {};

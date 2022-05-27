@@ -7,8 +7,7 @@ import { ChainId, Config, DAppProvider, useEthers } from '@usedapp/core';
 import Head from 'next/head';
 import { useEffect } from 'react';
 import { EventLog, EventLog__factory } from '../contracts/types';
-import { ADDRESSES } from '../utils/constants';
-import { ethers } from 'ethers';
+import { ConnectedEventLogAddress } from '../utils/constants';
 import _ from 'lodash';
 import { useEventLogs } from '../hooks/useEventLogs';
 import {
@@ -17,6 +16,7 @@ import {
 } from '../hooks/useSolidityEvents';
 import { convertTimestamp } from '../utils/helpers';
 import CustomAlert from '../components/Alert';
+import { getAlchemyProvider } from '../utils/contract/connectors';
 
 declare global {
   interface Window {
@@ -57,13 +57,10 @@ function MyApp({ Component, pageProps }: AppProps) {
   };
 
   const callContract = async () => {
-    const provider = new ethers.providers.InfuraProvider(
-      'kovan',
-      process.env.NEXT_PUBLIC_INFURA_KEY
-    );
+    const provider = getAlchemyProvider();
 
     const contract = EventLog__factory.connect(
-      ADDRESSES.eventLog[ChainId.Kovan],
+      ConnectedEventLogAddress,
       provider
     );
     if (!registeredEvents.length && account) {

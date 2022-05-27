@@ -1,4 +1,8 @@
-import { ADDRESSES, AvailableChains } from './../utils/constants';
+import {
+  ADDRESSES,
+  AvailableChains,
+  ConnectedEventLogAddress,
+} from './../utils/constants';
 import { useMemo } from 'react';
 import { useEthers } from '@usedapp/core';
 
@@ -15,7 +19,7 @@ export const useActiveChain = () => {
     }
     return {
       isActive: false,
-      eventLogAddress: '0x',
+      eventLogAddress: ConnectedEventLogAddress,
       eventFactoryAddress: '0x',
     };
   }, [chainId]);

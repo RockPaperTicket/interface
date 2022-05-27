@@ -42,8 +42,13 @@ export declare namespace EventGame {
 
 export interface EventGameInterface extends utils.Interface {
   functions: {
+    '_getAlgoPlay(uint256)': FunctionFragment;
+    'endGame()': FunctionFragment;
+    'getEventId()': FunctionFragment;
     'getScoreboard()': FunctionFragment;
+    'isWinner(address)': FunctionFragment;
     'register()': FunctionFragment;
+    's_eventId()': FunctionFragment;
     's_isRegistered(address)': FunctionFragment;
     's_registeredAddresses(uint256)': FunctionFragment;
     'scoreboard(address)': FunctionFragment;
@@ -57,8 +62,13 @@ export interface EventGameInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
+      | '_getAlgoPlay'
+      | 'endGame'
+      | 'getEventId'
       | 'getScoreboard'
+      | 'isWinner'
       | 'register'
+      | 's_eventId'
       | 's_isRegistered'
       | 's_registeredAddresses'
       | 'scoreboard'
@@ -71,10 +81,21 @@ export interface EventGameInterface extends utils.Interface {
   ): FunctionFragment;
 
   encodeFunctionData(
+    functionFragment: '_getAlgoPlay',
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: 'endGame', values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: 'getEventId',
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: 'getScoreboard',
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: 'isWinner', values: [string]): string;
   encodeFunctionData(functionFragment: 'register', values?: undefined): string;
+  encodeFunctionData(functionFragment: 's_eventId', values?: undefined): string;
   encodeFunctionData(
     functionFragment: 's_isRegistered',
     values: [string]
@@ -101,10 +122,18 @@ export interface EventGameInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: '_getAlgoPlay',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'endGame', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getEventId', data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: 'getScoreboard',
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: 'isWinner', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: 'register', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 's_eventId', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: 's_isRegistered',
     data: BytesLike
@@ -174,13 +203,31 @@ export interface EventGame extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    _getAlgoPlay(
+      _playId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[number]>;
+
+    endGame(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    getEventId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getScoreboard(
       overrides?: CallOverrides
     ): Promise<[EventGame.UserScoreStructOutput]>;
 
+    isWinner(
+      _userAddress: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     register(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    s_eventId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     s_isRegistered(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -227,13 +274,28 @@ export interface EventGame extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  _getAlgoPlay(
+    _playId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<number>;
+
+  endGame(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  getEventId(overrides?: CallOverrides): Promise<BigNumber>;
+
   getScoreboard(
     overrides?: CallOverrides
   ): Promise<EventGame.UserScoreStructOutput>;
 
+  isWinner(_userAddress: string, overrides?: CallOverrides): Promise<boolean>;
+
   register(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  s_eventId(overrides?: CallOverrides): Promise<BigNumber>;
 
   s_isRegistered(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -280,11 +342,24 @@ export interface EventGame extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    _getAlgoPlay(
+      _playId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<number>;
+
+    endGame(overrides?: CallOverrides): Promise<void>;
+
+    getEventId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getScoreboard(
       overrides?: CallOverrides
     ): Promise<EventGame.UserScoreStructOutput>;
 
+    isWinner(_userAddress: string, overrides?: CallOverrides): Promise<boolean>;
+
     register(overrides?: CallOverrides): Promise<void>;
+
+    s_eventId(overrides?: CallOverrides): Promise<BigNumber>;
 
     s_isRegistered(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -339,11 +414,29 @@ export interface EventGame extends BaseContract {
   };
 
   estimateGas: {
+    _getAlgoPlay(
+      _playId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    endGame(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    getEventId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getScoreboard(overrides?: CallOverrides): Promise<BigNumber>;
+
+    isWinner(
+      _userAddress: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     register(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    s_eventId(overrides?: CallOverrides): Promise<BigNumber>;
 
     s_isRegistered(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -382,11 +475,29 @@ export interface EventGame extends BaseContract {
   };
 
   populateTransaction: {
+    _getAlgoPlay(
+      _playId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    endGame(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getEventId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getScoreboard(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    isWinner(
+      _userAddress: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     register(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    s_eventId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     s_isRegistered(
       arg0: string,

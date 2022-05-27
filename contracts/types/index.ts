@@ -4,7 +4,9 @@
 export type { EventFactory } from './EventFactory';
 export type { EventGame } from './EventGame';
 export type { EventLog } from './EventLog';
+export type { MintTicket } from './MintTicket';
 export * as factories from './factories';
 export { EventFactory__factory } from './factories/EventFactory__factory';
 export { EventGame__factory } from './factories/EventGame__factory';
 export { EventLog__factory } from './factories/EventLog__factory';
+export { MintTicket__factory } from './factories/MintTicket__factory';
