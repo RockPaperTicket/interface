@@ -20,7 +20,7 @@ import {
   useBoolean,
   useInterval,
 } from '@chakra-ui/react';
-import { shortenIfAddress, useEthers } from '@usedapp/core';
+import { ChainId, shortenIfAddress, useEthers } from '@usedapp/core';
 import { ethers } from 'ethers';
 import { motion } from 'framer-motion';
 import _ from 'lodash';
@@ -28,10 +28,14 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Button from '../../components/common/Button';
-import { EventGame, EventGame__factory } from '../../contracts/types';
+import {
+  EventGame,
+  EventGame__factory,
+  MintTicket__factory,
+} from '../../contracts/types';
 import { useActiveChain } from '../../hooks/useActiveChain';
 import { useAlert } from '../../hooks/useAlert';
-import { ConnectToNetwork } from '../../utils/constants';
+import { ADDRESSES, ConnectToNetwork } from '../../utils/constants';
 import { getAlchemyProvider } from '../../utils/contract/connectors';
 
 interface Leaderboard {
@@ -72,6 +76,7 @@ export default function Game() {
     getScore(contract);
     getResultEvent(contract);
     calculateLeaderboard(contract);
+    getIsWinner(contract);
     setGameContract(contract);
 
     const filters = contract.filters.result(gameAddress, account);
@@ -144,9 +149,11 @@ export default function Game() {
     setLeaderboard(_.orderBy(leaderboard, ['points'], ['asc']));
   };
 
-  const getIsWinner = async () => {
+  const getIsWinner = async (_contract?: EventGame) => {
     if (!account) return;
-    const isWinner = await gameContract?.isWinner(account);
+    const contract = _contract ?? gameContract;
+    const isWinner = await contract?.isWinner(account);
+    console.log('winnd', isWinner);
     setIsWinner(isWinner ?? false);
   };
 
@@ -218,9 +225,57 @@ export default function Game() {
     setLoading.off();
   };
 
+  const _mintTicket = async () => {
+    setLoading.on();
+    try {
+      const signer = library?.getSigner();
+
+      if (!gameAddress || !signer) return;
+      const contract = MintTicket__factory.connect(
+        ADDRESSES.mintTicket[ChainId.Rinkeby],
+        signer
+      );
+      const tx = await contract.mintTicket(gameAddress);
+      await tx.wait();
+      openAlert("You've minted your ticket", 'success');
+    } catch (error: any) {
+      openAlert(
+        error.message.replace(
+          'VM Exception while processing transaction: revert ',
+          ''
+        )
+      );
+    }
+    setLoading.off();
+  };
+
+  if (status === 0)
+    return (
+      <Center flexDirection="column" gap={3} minH="80vh">
+        <Text fontSize={'2xl'}>The game is not started yet</Text>
+      </Center>
+    );
+
+  if (status === 2)
+    return (
+      <Center flexDirection="column" gap={3} minH="80vh">
+        <Text fontSize={'2xl'}>The game has come to an end</Text>
+        {isWinner && (
+          <>
+            <Text>
+              Congratulations, You&apos;re able to mint your ticket here
+            </Text>
+            <Button onClick={_mintTicket} isLoading={isLoading}>
+              Mint Ticket
+            </Button>
+          </>
+        )}
+      </Center>
+    );
+
   if (!isRegistered)
     return (
-      <Center flexDirection="column" minH="100vh">
+      <Center flexDirection="column" gap={3} minH="80vh">
         <Text fontSize={'2xl'}>
           You need to be registered in order to be able to play the game
         </Text>
@@ -229,14 +284,6 @@ export default function Game() {
             Register
           </Button>
         )}
-      </Center>
-    );
-
-  if (status === 2)
-    return (
-      <Center flexDirection="column" gap={3} minH="100vh" minW="100vw">
-        <Text fontSize={'2xl'}>The game has come to an end</Text>
-        {isWinner && <Text>You&apos;re able to mint a ticket here</Text>}
       </Center>
     );
 
