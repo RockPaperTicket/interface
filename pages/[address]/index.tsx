@@ -46,6 +46,11 @@ interface Leaderboard {
 }
 
 const signs = ['rock', 'paper', 'scissor'];
+enum GameStatus {
+  registering,
+  started,
+  ended,
+}
 
 export default function Game() {
   const [gameContract, setGameContract] = useState<EventGame>();
@@ -57,6 +62,7 @@ export default function Game() {
   const [history, setHistory] = useState<string[]>([]);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [status, setStatus] = useState(0);
+  const [gameStatus, setGameStatus] = useState<GameStatus>(2);
   const [showResult, setShowResult] = useState(false);
 
   const router = useRouter();
@@ -127,6 +133,7 @@ export default function Game() {
     if (!isActive || status === 2) return;
     const contract = _contract ?? gameContract;
     const getStatus = await contract?.status();
+    console.log(getStatus);
     setStatus(getStatus ?? 0);
     const leaderboard: Leaderboard[] = [];
     for (let i = 0; i < 1000; i++) {
@@ -162,6 +169,7 @@ export default function Game() {
   }, [isActive, account]);
 
   useEffect(() => {
+    setGameStatus(status);
     if (status === 2) {
       getIsWinner();
     }
@@ -249,14 +257,14 @@ export default function Game() {
     setLoading.off();
   };
 
-  if (status === 0)
+  if (gameStatus === GameStatus.registering)
     return (
       <Center flexDirection="column" gap={3} minH="80vh">
         <Text fontSize={'2xl'}>The game is not started yet</Text>
       </Center>
     );
 
-  if (status === 2)
+  if (gameStatus === GameStatus.ended)
     return (
       <Center flexDirection="column" gap={3} minH="80vh">
         <Text fontSize={'2xl'}>The game has come to an end</Text>
